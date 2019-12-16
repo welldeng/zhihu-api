@@ -1,0 +1,28 @@
+{
+  "name": "restful-api",
+  "version": "1.0.0",
+  "description": "node restful-api serve",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app",
+    "prod": "export NODE_ENV=production && node app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "restful-api"
+  ],
+  "author": "dengcong",
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.8.1",
+    "koa-body": "^4.1.1",
+    "koa-json-error": "^3.1.2",
+    "koa-jwt": "^3.6.0",
+    "koa-parameter": "^3.0.1",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
+    "mongoose": "^5.6.11",
+    "nodemon": "^1.19.1"
+  }
+}
