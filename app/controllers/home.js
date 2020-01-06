@@ -5,6 +5,7 @@ class HomeCtrl {
     ctx.body = '<h1>这是主页</h1>'
   }
 
+  // 上传图片
   upload (ctx) {
     const file = ctx.request.files.file
     const basename = path.basename(file.path)
