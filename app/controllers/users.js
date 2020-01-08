@@ -82,7 +82,7 @@ class UsersCtrl {
 
   // 删除用户
   async del (ctx) {
-    const user = await User.findByIdAndRemove(ctx.params.id)
+    await User.findByIdAndRemove(ctx.params.id)
     ctx.status = 204
   }
 
@@ -162,6 +162,27 @@ class UsersCtrl {
     const index = me.followingTopics.map(e => e.toString()).indexOf(ctx.params.id)
     if (index > -1) {
       me.followingTopics.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
+
+  // 关注问题
+  async followQuestion (ctx) {
+    const me = await User.findById(ctx.state.user._id).select('+followingQuestions')
+    if (!me.followingQuestions.map(e => e.toString()).includes(ctx.params.id)) {
+      me.followingQuestions.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 204
+  }
+
+  // 取消关注问题
+  async unfollowQuestion (ctx) {
+    const me = await User.findById(ctx.state.user._id).select('+followingQuestions')
+    const index = me.followingQuestions.map(e => e.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingQuestions.splice(index, 1)
       me.save()
     }
     ctx.status = 204

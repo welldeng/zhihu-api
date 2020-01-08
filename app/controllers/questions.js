@@ -1,5 +1,6 @@
 const Question = require('../models/questions')
-const User = require('../models/users')
+
+// const User = require('../models/users')
 
 class QuestionsCtrl {
   // 查询问题列表
@@ -17,7 +18,7 @@ class QuestionsCtrl {
   async findById (ctx) {
     const { fields = '' } = ctx.query
     const selectFields = fields.split(';').filter(e => e).map(e => ' +' + e).join('')
-    const question = await Question.findById(ctx.params.id).select(selectFields).populate('questioner')
+    const question = await Question.findById(ctx.params.id).select(selectFields).populate('questioner topics')
     if (!question) {ctx.throw(404, '问题不存在')}
     ctx.body = question
   }
@@ -26,7 +27,8 @@ class QuestionsCtrl {
   async create (ctx) {
     ctx.verifyParams({
       title: { type: 'string', required: true },
-      description: { type: 'string', required: false }
+      description: { type: 'string', required: false },
+      topics: { type: 'array', required: false }
     })
     ctx.body = await new Question({ ...ctx.request.body, questioner: ctx.state.user._id }).save()
   }
@@ -35,7 +37,8 @@ class QuestionsCtrl {
   async update (ctx) {
     ctx.verifyParams({
       title: { type: 'string', required: false },
-      description: { type: 'string', required: false }
+      description: { type: 'string', required: false },
+      topics: { type: 'array', required: false }
     })
     await ctx.state.question.update(ctx.request.body)
     ctx.body = ctx.state.question
@@ -43,11 +46,11 @@ class QuestionsCtrl {
 
   // 删除问题
   async del (ctx) {
-    const user = await Question.findByIdAndRemove(ctx.params.id)
+    await Question.findByIdAndRemove(ctx.params.id)
     ctx.status = 204
   }
 
-  // 检测话题是否存在
+  // 检测问题是否存在
   async checkQuestionExist (ctx, next) {
     const question = await Question.findById(ctx.params.id).select('+questioner')
     if (!question) {ctx.throw(404, '问题不存在')}
@@ -55,7 +58,7 @@ class QuestionsCtrl {
     await next()
   }
 
-  // 检测是否拥有话题
+  // 检测是否拥有问题
   async checkQuestioner (ctx, next) {
     const { question } = ctx.state
     if (question.questioner.toString() !== ctx.state.user._id) {ctx.throw(403, '无权限删除')}

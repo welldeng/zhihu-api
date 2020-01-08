@@ -29,7 +29,8 @@ const userSchema = new Schema({
     select: false
   },
   following: { type: [ { type: Schema.Types.ObjectId, ref: 'User' } ], select: false },
-  followingTopics: { type: [ { type: Schema.Types.ObjectId, ref: 'Topic' } ], select: false }
+  followingTopics: { type: [ { type: Schema.Types.ObjectId, ref: 'Topic' } ], select: false },
+  followingQuestions: { type: [ { type: Schema.Types.ObjectId, ref: 'Question' } ], select: false }
 })
 
 module.exports = model('User', userSchema)

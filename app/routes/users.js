@@ -4,11 +4,13 @@ const router = new Router({ prefix: '/users' })
 const {
   find, findById, create, update, del, login, checkOwner,
   listFollowing, checkUserExist, follow, unfollow, listFollowers,
-  followTopic, unfollowTopic, listFollowingTopics, listQuestions
+  followTopic, unfollowTopic, listFollowingTopics, listQuestions,
+  followQuestion, unfollowQuestion
 } = require('../controllers/users')
 const { secret } = require('../config')
 const auth = jwt({ secret })
 const { checkTopicExist } = require('../controllers/topics')
+const { checkQuestionExist } = require('../controllers/questions')
 
 // 查询用户列表
 router.get('/', find)
@@ -37,6 +39,9 @@ router.get('/:id/followers', listFollowers)
 // 查询用户话题列表
 router.get('/:id/followingTopics', listFollowingTopics)
 
+// 查询用户问题列表
+router.get('/:id/questions', listQuestions)
+
 // 关注用户
 router.put('/following/:id', auth, checkUserExist, follow)
 
@@ -49,7 +54,10 @@ router.put('/followingTopics/:id', auth, checkTopicExist, followTopic)
 // 取消关注话题
 router.delete('/followingTopics/:id', auth, checkTopicExist, unfollowTopic)
 
-// 查询用户问题列表
-router.get('/:id/questions', listQuestions)
+// 关注问题
+router.put('/followingQuestions/:id', auth, checkQuestionExist, followQuestion)
+
+// 取消关注问题
+router.delete('/followingQuestions/:id', auth, checkQuestionExist, unfollowQuestion)
 
 module.exports = router
