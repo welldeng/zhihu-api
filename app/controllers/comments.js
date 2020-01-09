@@ -1,4 +1,4 @@
-const Comment = require('../models/comment')
+const Comment = require('../models/comments')
 
 // const User = require('../models/users')
 
@@ -10,17 +10,18 @@ class CommentsCtrl {
     const perPage = Math.max(per_page, 1)
     const q = new RegExp(ctx.query.q)
     const { questionId, answerId } = ctx.params
-    ctx.body = await Comment.find({ content: q, questionId, answerId })
+    const { rootCommentId } = ctx.query
+    ctx.body = await Comment.find({ content: q, questionId, answerId, rootCommentId })
       .limit(perPage)
       .skip(page * perPage)
-      .populate('commentator')
+      .populate('commentator replyTo')
   }
 
   // 查询特定评论
   async findById (ctx) {
     const { fields = '' } = ctx.query
     const selectFields = fields.split(';').filter(e => e).map(e => ' +' + e).join('')
-    const comment = await Comment.findById(ctx.params.id).select(selectFields).populate('commentator')
+    const comment = await Comment.findById(ctx.params.id).select(selectFields).populate('commentator replyTo')
     if (!comment) {ctx.throw(404, '评论不存在')}
     ctx.body = comment
   }
@@ -28,7 +29,9 @@ class CommentsCtrl {
   // 新建评论
   async create (ctx) {
     ctx.verifyParams({
-      content: { type: 'string', required: true }
+      content: { type: 'string', required: true },
+      rootCommentId: { type: 'string', required: false },
+      replyTo: { type: 'string', required: false },
     })
     const commentator = ctx.state.user._id
     const { questionId, answerId } = ctx.params
@@ -45,7 +48,8 @@ class CommentsCtrl {
     ctx.verifyParams({
       content: { type: 'string', required: false }
     })
-    await ctx.state.comment.update(ctx.request.body)
+    const { content } = ctx.request.body
+    await ctx.state.comment.update({ content })
     ctx.body = ctx.state.comment
   }
 

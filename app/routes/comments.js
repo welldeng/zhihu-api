@@ -1,7 +1,7 @@
 const jwt = require('koa-jwt')
 const Router = require('koa-router')
 const router = new Router({ prefix: '/questions/:questionId/answers/:answerId/comments' })
-const { find, findById, create, update, del, checkCommentator, checkCommentExist } = require('../controllers/comment')
+const { find, findById, create, update, del, checkCommentator, checkCommentExist } = require('../controllers/comments')
 const { secret } = require('../config')
 const auth = jwt({ secret })
 
