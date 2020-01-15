@@ -8,13 +8,16 @@ const {
   listQuestions, followQuestion, unfollowQuestion,
   listLikingAnswers, likeAnswer, unlikeAnswer,
   listDislikingAnswers, dislikeAnswer, undislikeAnswer,
-  listCollectingAnswers, collectAnswer, uncollectAnswer
+  listCollectingAnswers, collectAnswer, uncollectAnswer,
+  listLikingComments, likeComment, unlikeComment,
+  listDislikingComments, dislikeComment, undislikeComment
 } = require('../controllers/users')
 const { secret } = require('../config')
 const auth = jwt({ secret })
 const { checkTopicExist } = require('../controllers/topics')
 const { checkQuestionExist } = require('../controllers/questions')
 const { checkAnswerExist } = require('../controllers/answers')
+const { checkCommentExist } = require('../controllers/comments')
 
 // 查询用户列表
 router.get('/', find)
@@ -55,6 +58,12 @@ router.get('/:id/dislikingAnswers', listDislikingAnswers)
 // 查询用户收藏答案列表
 router.get('/:id/collectingAnswers', listCollectingAnswers)
 
+// 查询用户点赞评论列表
+router.get('/:id/likingComments', listLikingComments)
+
+// 查询用户点踩评论列表
+router.get('/:id/dislikingComments', listDislikingComments)
+
 // 关注用户
 router.put('/following/:id', auth, checkUserExist, follow)
 
@@ -90,5 +99,17 @@ router.put('/collectingAnswers/:id', auth, checkAnswerExist, collectAnswer)
 
 // 取消收藏答案
 router.delete('/collectingAnswers/:id', auth, checkAnswerExist, uncollectAnswer)
+
+// 点赞评论
+router.put('/likingComments/:id', auth, checkCommentExist, likeComment, unlikeComment)
+
+// 取消点赞评论
+router.delete('/likingComments/:id', auth, checkCommentExist, unlikeComment)
+
+// 点踩评论
+router.put('/dislikingComments/:id', auth, checkCommentExist, dislikeComment, undislikeComment)
+
+// 取消点踩评论
+router.delete('/dislikingComments/:id', auth, checkCommentExist, undislikeComment)
 
 module.exports = router

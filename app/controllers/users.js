@@ -281,6 +281,66 @@ class UsersCtrl {
     }
     ctx.status = 204
   }
+
+  // 查询用户赞过的评论列表
+  async listLikingComments (ctx) {
+    const user = await User.findById(ctx.params.id).select('+likingComments').populate('likingComments')
+    if (!user) {ctx.throw(404, '用户不存在')}
+    ctx.body = user.likingComments
+  }
+
+  // 点赞评论
+  async likeComment (ctx, next) {
+    const me = await User.findById(ctx.state.user._id).select('+likingComments')
+    if (!me.likingComments.map(e => e.toString()).includes(ctx.params.id)) {
+      me.likingComments.push(ctx.params.id)
+      me.save()
+      await Answer.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: 1 } })
+    }
+    ctx.status = 204
+    await next()
+  }
+
+  // 取消点赞评论
+  async unlikeComment (ctx) {
+    const me = await User.findById(ctx.state.user._id).select('+likingComments')
+    const index = me.likingComments.map(e => e.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.likingComments.splice(index, 1)
+      me.save()
+      await Answer.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: -1 } })
+    }
+    ctx.status = 204
+  }
+
+  // 查询用户踩过的评论列表
+  async listDislikingComments (ctx) {
+    const user = await User.findById(ctx.params.id).select('+dislikingComments').populate('dislikingComments')
+    if (!user) {ctx.throw(404, '用户不存在')}
+    ctx.body = user.dislikingComments
+  }
+
+  // 点踩评论
+  async dislikeComment (ctx, next) {
+    const me = await User.findById(ctx.state.user._id).select('+dislikingComments')
+    if (!me.dislikingComments.map(e => e.toString()).includes(ctx.params.id)) {
+      me.dislikingComments.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 204
+    await next()
+  }
+
+  // 取消点踩评论
+  async undislikeComment (ctx) {
+    const me = await User.findById(ctx.state.user._id).select('+dislikingComments')
+    const index = me.dislikingComments.map(e => e.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.dislikingComments.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
 }
 
 module.exports = new UsersCtrl()
